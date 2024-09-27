@@ -23,6 +23,7 @@ router.get("/info", async (req, res) => {
     const info = await ytdl.getInfo(url);
     res.json(info);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: "Url is not valid" });
   }
 });
