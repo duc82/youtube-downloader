@@ -5,6 +5,7 @@ import { spawn } from "child_process";
 import fs from "fs";
 import sanitize from "sanitize-filename";
 import internal from "stream";
+import cookies from "../data/cookies.json";
 
 const router = Router();
 
@@ -20,7 +21,8 @@ interface DownloadDto {
 router.get("/info", async (req, res) => {
   try {
     const url = req.query.url as string;
-    const info = await ytdl.getInfo(url);
+    const agent = ytdl.createAgent(cookies);
+    const info = await ytdl.getInfo(url, { agent });
     res.json(info);
   } catch (error) {
     console.log(error);
@@ -31,6 +33,8 @@ router.get("/info", async (req, res) => {
 router.post("/download", async (req, res) => {
   try {
     const body = req.body as DownloadDto;
+
+    const agent = ytdl.createAgent(cookies);
 
     if (!ffmpeg) {
       return res.status(500).json({ message: "FFmpeg not found" });
@@ -60,6 +64,7 @@ router.post("/download", async (req, res) => {
     if (body.type === "audio") {
       const audioStream = ytdl(body.url, {
         filter: (format) => format.itag === body.itag,
+        agent,
       });
 
       const ffmpegProcess = spawn(ffmpeg, [
@@ -114,10 +119,12 @@ router.post("/download", async (req, res) => {
 
     const audioStream = ytdl(body.url, {
       quality: "highestaudio",
+      agent,
     });
 
     const videoStream = ytdl(body.url, {
       filter: (format) => format.itag === body.itag,
+      agent,
     });
 
     const ffmpegProcess = spawn(
