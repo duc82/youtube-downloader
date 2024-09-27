@@ -1,4 +1,4 @@
-import { ClipboardEvent, Fragment, useEffect, useState } from "react";
+import { ClipboardEvent, Fragment, useState } from "react";
 import { VideoInfo } from "../types/video";
 import formatBytes from "../utils/formatBytes";
 import clsx from "clsx";
